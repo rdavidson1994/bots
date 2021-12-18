@@ -2,7 +2,7 @@ use std::{env, str::FromStr};
 
 use anyhow::{Result, Context};
 
-use crate::{arguments::CommandArgument, game_state::GameState, command_state::CommandState};
+use crate::{arguments::CommandArgument, game_state::GameState, command_state::CommandState, order::Order};
 mod bot;
 mod game_state;
 mod order;
@@ -16,15 +16,16 @@ fn main() -> Result<()> {
         .collect::<Result<Vec<_>>>()
         .context("Unable to parse command line arguments.")?;
     
+    let mut game_state = GameState::new();
     let mut command_state = CommandState::new();
 
     for arg in &args {
         use CommandArgument::*;
         match arg {
-            Dance => todo!(),
-            CommandArgument::Wait => todo!(),
-            CommandArgument::BotId(_) => todo!(),
-            CommandArgument::Go => todo!(),
+            Dance => command_state.set_order(Order::Dance),
+            Wait => command_state.set_order(Order::Wait),
+            BotId(id) => command_state.add_bot(*id),
+            Go => command_state.apply(&mut game_state).context("Unable to apply commands.")?,
         }
     }
 
@@ -33,7 +34,7 @@ fn main() -> Result<()> {
         println!("{:?}", arg)
     }
     println!();
-    let game_state = GameState::new();
+
     let bot_orders = game_state.get_bot_orders();
     println!("Bot orders:\n{}", bot_orders);
     Ok(())
