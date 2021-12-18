@@ -2,11 +2,12 @@ use std::{env, str::FromStr};
 
 use anyhow::{Result, Context};
 
-use crate::{arguments::CommandArgument, game_state::GameState};
+use crate::{arguments::CommandArgument, game_state::GameState, command_state::CommandState};
 mod bot;
 mod game_state;
 mod order;
 mod arguments;
+mod command_state;
 
 fn main() -> Result<()> {
     let args = env::args()
@@ -15,8 +16,20 @@ fn main() -> Result<()> {
         .collect::<Result<Vec<_>>>()
         .context("Unable to parse command line arguments.")?;
     
+    let mut command_state = CommandState::new();
+
+    for arg in &args {
+        use CommandArgument::*;
+        match arg {
+            Dance => todo!(),
+            CommandArgument::Wait => todo!(),
+            CommandArgument::BotId(_) => todo!(),
+            CommandArgument::Go => todo!(),
+        }
+    }
+
     println!("Command line arguments:");
-    for arg in args {
+    for arg in &args {
         println!("{:?}", arg)
     }
     println!();
