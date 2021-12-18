@@ -1,4 +1,6 @@
-use crate::{bot::Bot, order::Order};
+use anyhow::bail;
+
+use crate::bot::Bot;
 pub struct GameState {
     bots: Vec<Bot>,
 }
@@ -6,14 +8,20 @@ pub struct GameState {
 impl GameState {
     pub fn new() -> Self {
         GameState {
-            bots: vec![
-                Bot::new(0),
-                Bot {
-                    order: Order::Dance,
-                    id: 1,
-                },
-                Bot::new(2),
-            ],
+            bots: vec![Bot::new(0), Bot::new(1), Bot::new(2)],
+        }
+    }
+
+    pub fn edit_bot<T>(
+        &mut self,
+        bot_id: usize,
+        edit: impl Fn(&mut Bot) -> T,
+    ) -> anyhow::Result<T> {
+        if bot_id < self.bots.len() {
+            Ok(edit(&mut self.bots[bot_id]))
+        }
+        else {
+            bail!("Invalid bot ID {}", bot_id);
         }
     }
 

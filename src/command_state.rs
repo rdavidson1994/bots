@@ -1,19 +1,19 @@
-use std::{collections::HashSet, future::Ready};
+use std::collections::HashSet;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 
-use crate::{arguments::CommandArgument, order::Order, game_state::GameState};
+use crate::{game_state::GameState, order::Order};
 
 pub struct CommandState {
     order: Option<Order>,
-    bot_ids: HashSet<usize>
+    bot_ids: HashSet<usize>,
 }
 
 impl CommandState {
     pub fn new() -> CommandState {
         CommandState {
             order: None,
-            bot_ids: Default::default()
+            bot_ids: Default::default(),
         }
     }
 
@@ -26,7 +26,12 @@ impl CommandState {
     }
 
     pub fn apply(&self, game_state: &mut GameState) -> Result<()> {
-        
+        let order = self.order.context("No order specified.")?;
+        for bot_id in &self.bot_ids {
+            game_state.edit_bot(*bot_id, |bot| {
+                bot.order = order;
+            })?
+        }
         Ok(())
     }
 }
